@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdlib.h>
 
 #define AS_HEAP_CHUNK 32

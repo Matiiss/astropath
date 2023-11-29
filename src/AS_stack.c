@@ -26,15 +26,22 @@
 
 void AS_StackInit(AS_Stack *self) {
     self->head = NULL;
+    self->size = 0;
 
     self->push = &AS_StackPush;
     self->pop = &AS_StackPop;
     self->free = &AS_StackFree;
 }
 
-void AS_StackPush(AS_Stack *self, void *data) {
+int AS_StackPush(AS_Stack *self, void *data) {
     AS_StackNode *new_node = malloc(sizeof(AS_StackNode));
+
+    if (!new_node) {
+        return 1;
+    }
+
     new_node->data = data;
+    self->size++;
     
     if (self->head == NULL) {
         new_node->next = NULL;
@@ -43,6 +50,7 @@ void AS_StackPush(AS_Stack *self, void *data) {
     }
 
     self->head = new_node;
+    return 0;
 }
 
 void *AS_StackPop(AS_Stack *self) {
@@ -54,6 +62,8 @@ void *AS_StackPop(AS_Stack *self) {
     void *data = node->data;
     self->head = node->next;
     free(node);
+
+    self->size--;
 
     return data;
 }

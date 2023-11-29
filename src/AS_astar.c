@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 #include "./AS_astar.h"
-#include "./AS_heap.c"
+#include "./AS_heap.h"
+#include "./AS_stack.h"
 
 #define UNUSED(x) (void)x
 // #define N 100
@@ -90,7 +91,7 @@
 //     return 0;
 // }
 
-// float EuclidianDistance(AS_ANode *self, AS_ANode *other) {
+// double EuclidianDistance(AS_ANode *self, AS_ANode *other) {
 //     int x1, y1, x2, y2;
 //     x1 = ((int *)self->data)[0];
 //     y1 = ((int *)self->data)[1];
@@ -104,21 +105,45 @@ void AS_ANodeFree(AS_ANode *self) {
     free(self->neighbours);
 }
 
-float AS_DijkstraHeuristic(AS_ANode *current, AS_ANode *target) {
+double AS_DijkstraHeuristic(AS_ANode *current, AS_ANode *target) {
     UNUSED(current);
     UNUSED(target);
     return 0;
+}
+
+double AS_EuclidianDistanceHeuristic(AS_ANode *self, AS_ANode *target) {
+    int x1, y1, x2, y2;
+    x1 = ((int *)self->data)[0];
+    y1 = ((int *)self->data)[1];
+    x2 = ((int *)target->data)[0];
+    y2 = ((int *)target->data)[1];
+
+    return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 }
 
 int AS_AStarLeastDistance(void *primary, void *secondary) {
     return ((AS_ANode *)primary)->tentative_distance < ((AS_ANode *)secondary)->tentative_distance;
 }
 
+int AS_AStarReconstructPath(AS_ANode *end, AS_Stack *stack) {
+    AS_StackInit(stack);
+    AS_ANode *current = end;
+    do
+    {
+        if (stack->push(stack, (void *)current)) {
+            return 1;
+        }
+    } while (current = current->previous);
+
+    return 0;
+}
+
 int AS_AStarSearch(
-    AS_ANode *node_array, 
-    size_t array_size, 
-    AS_ANode *start, 
-    AS_ANode *target, 
+    AS_ANode *node_array,
+    size_t array_size,
+    AS_ANode *start,
+    AS_ANode *target,
+    AS_AStarEqualityCheck eq_check,
     AS_AStarHeuristic heuristic
 ) {
     if (heuristic == NULL) {
@@ -139,7 +164,7 @@ int AS_AStarSearch(
             node->distance = INFINITY;
             node->tentative_distance = INFINITY;
         }
-        node->visited = 0;
+        // node->visited = 0;
         node_heap->push(node_heap, (void *)node);
     }
 
@@ -148,12 +173,13 @@ int AS_AStarSearch(
         AS_ANode *node = (AS_ANode *)node_heap->pop(node_heap);
         node->visited = 1;
 
+        // if (eq_check(node, target)) {
         if (node == target) {
             if (node->previous == NULL) {
                 goto failure;
             } else {
                 node_heap->free(node_heap);
-                return 1;
+                return 0;
             }
         }
 
@@ -168,20 +194,30 @@ int AS_AStarSearch(
             //     continue;
             // }
 
-            float distance = node->distance + node->distance_to(node, neighbour);
+            double distance = node->distance + node->distance_to(node, neighbour);
             if (distance < neighbour->distance) {
                 neighbour->previous = node;
                 neighbour->distance = distance;
-                neighbour->tentative_distance = heuristic(neighbour, target);
+                neighbour->tentative_distance = distance + heuristic(neighbour, target);
 
                 if (neighbour->visited) {
                     node_heap->push(node_heap, neighbour);
                 }
+                // int contains = 0;
+                // for (size_t i = 0; i < node_heap->length; ++i) {
+                //     if (eq_check(neighbour, node_heap->tree[i])) {
+                //         contains = 1;
+                //         break;
+                //     }
+                // }
+                // if (!contains) {
+                //     node_heap->push(node_heap, neighbour);
+                // }
             }
         }
     }
 
 failure:
     node_heap->free(node_heap);
-    return 0;
+    return 1;
 }
