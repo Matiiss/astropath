@@ -1,8 +1,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include "./AS_astar.c"
-#include "./AS_stack.c"
+#include "./AS_astar.h"
+#include "./AS_stack.h"
 
 static PyObject *astar_search(PyObject *self, PyObject *args);
 
@@ -36,8 +36,6 @@ astar_search(PyObject *self, PyObject *args) {
     AS_ANode *node_arr;
     Py_ssize_t node_arr_length;
     AS_ANode *node_start, *node_end;
-
-    PyObject *exc;
 
     if (!PyArg_ParseTuple(args, "OOO", &dict, &py_start, &py_end)) {
         return NULL;
