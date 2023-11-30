@@ -40,6 +40,7 @@ int AS_ListInit(AS_List *self) {
 
     self->append = &AS_ListAppend;
     self->get_at = &AS_ListGetAt;
+    self->set_at = &AS_ListSetAt;
     self->pop = &AS_ListPop;
     self->pop_end = &AS_ListPopEnd;
     self->free = &AS_ListFree;
@@ -67,6 +68,15 @@ void *AS_ListGetAt(AS_List *self, size_t index) {
     }
 
     return self->array[index];
+}
+
+int AS_ListSetAt(AS_List *self, size_t index, void *item) {
+    if (index >= self->length) {
+        return 1;
+    }
+
+    self->array[index] = item;
+    return 0;
 }
 
 void *AS_ListPop(AS_List *self, size_t index) {
