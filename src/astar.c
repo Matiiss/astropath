@@ -59,9 +59,9 @@ astar_search(PyObject *self, PyObject *args) {
         node_arr[i] = node;
 
         if (PyObject_RichCompareBool((PyObject *)node.data, py_start, Py_EQ)) {
-            node_start = &node;
+            node_start = &node_arr[i];
         } else if (PyObject_RichCompareBool((PyObject *)node.data, py_end, Py_EQ)) {
-            node_end = &node;
+            node_end = &node_arr[i];
         }
     }
 
@@ -90,12 +90,14 @@ astar_search(PyObject *self, PyObject *args) {
     if (AS_AStarSearch(node_arr, node_arr_length, node_start, node_end, &position_compare, &euclidian_distance) == 0) {
         AS_Stack stack;
         AS_AStarReconstructPath(node_end, &stack);
-        ret_list = PyList_New(stack.size);
-        for (Py_ssize_t i = 0; i < (Py_ssize_t)stack.size; ++i) {
+        Py_ssize_t length = stack.size;
+        ret_list = PyList_New(length);
+        for (Py_ssize_t i = 0; i < length; ++i) {
             PyObject *element = stack.pop(&stack);
             Py_INCREF(element);
             PyList_SetItem(ret_list, i, element);
         }
+
         return ret_list;
     }
 

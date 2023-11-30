@@ -130,7 +130,7 @@ int AS_AStarReconstructPath(AS_ANode *end, AS_Stack *stack) {
     AS_ANode *current = end;
     do
     {
-        if (stack->push(stack, (void *)current)) {
+        if (stack->push(stack, (void *)current->data)) {
             return 1;
         }
     } while (current = current->previous);
@@ -164,7 +164,7 @@ int AS_AStarSearch(
             node->distance = INFINITY;
             node->tentative_distance = INFINITY;
         }
-        // node->visited = 0;
+        node->visited = 0;
         node_heap->push(node_heap, (void *)node);
     }
 
