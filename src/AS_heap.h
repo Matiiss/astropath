@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#define AS_HEAP_CHUNK 32
-
 typedef struct AS_Heap AS_Heap;
 
 struct AS_Heap {
@@ -22,5 +20,4 @@ int AS_HeapInit(AS_Heap *self, int (compare)(void *primary, void *secondary));
 int AS_HeapPush(AS_Heap *self, void *element);
 void *AS_HeapPop(AS_Heap *self);
 void AS_HeapHeapify(AS_Heap *self);
-void _AS_HeapHeapify(AS_Heap *self, size_t index);
 void AS_HeapFree(AS_Heap *self);

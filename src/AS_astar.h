@@ -32,7 +32,6 @@ int AS_AStarSearch(
     AS_ANode *node_array, 
     size_t array_size, 
     AS_ANode *start, 
-    AS_ANode *target, 
-    AS_AStarEqualityCheck eq_check,
+    AS_ANode *target,
     AS_AStarHeuristic heuristic
 );

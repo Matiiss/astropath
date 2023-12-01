@@ -3,27 +3,6 @@
 
 #include "./AS_stack.h"
 
-// int main() {
-//     AS_Stack stack_obj, *stack;
-//     stack = &stack_obj;
-//     AS_StackInit(stack);
-
-//     int arr[5] = {1, 2, 7, 4, 5};
-
-//     for (int i = 0; i < 5; ++i) {
-//         stack->push(stack, (void *)&arr[i]);
-//     }
-
-//     void *data;
-//     while ((data = stack->pop(stack))) {
-//         printf("%i ", *(int *)data);
-//     }
-
-//     stack->free(stack);
-
-//     return 0;
-// }
-
 void AS_StackInit(AS_Stack *self) {
     self->head = NULL;
     self->size = 0;

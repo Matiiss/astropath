@@ -3,34 +3,9 @@
 
 #include "./AS_heap.h"
 
-// int CompareNumbersLT(void *primary, void *secondary);
-// int CompareNumbersGT(void *primary, void *secondary);
+#define AS_HEAP_CHUNK 32
 
-// int main() {
-//     int arr[8] = {10, 20, 25, 6, 12, 15, 4, 16};
-
-//     AS_Heap heap_obj;
-//     AS_Heap *heap = &heap_obj;
-//     AS_HeapInit(heap, &CompareNumbersLT);
-
-//     for (int i = 0; i < 8; ++i) {
-//         heap->push(heap, (void *)(arr + i));
-//     }
-
-//     for (int i = 0; i < 8; ++i) {
-//         printf("%i ", *(int *)heap->pop(heap));
-//     }
-
-//     return 0;
-// }
-
-// int CompareNumbersLT(void *primary, void *secondary) {
-//     return *(int *)primary < *(int *)secondary;
-// }
-
-// int CompareNumbersGT(void *primary, void *secondary) {
-//     return *(int *)primary > *(int *)secondary;
-// }
+void heapify(AS_Heap *self, size_t index);
 
 int AS_HeapInit(AS_Heap *self, int (*compare)(void *primary, void *secondary)) {
     self->tree = (void **)malloc(sizeof(void *) * AS_HEAP_CHUNK);
@@ -78,11 +53,11 @@ void *AS_HeapPop(AS_Heap *self) {
 
 void AS_HeapHeapify(AS_Heap *self) {
     for (size_t index = self->length / 2; index >= 1; --index) {
-        _AS_HeapHeapify(self, index - 1);
+        heapify(self, index - 1);
     }
 }
 
-void _AS_HeapHeapify(AS_Heap *self, size_t index) {
+void heapify(AS_Heap *self, size_t index) {
     size_t left = index * 2 + 1;
     size_t right = index * 2 + 2;
     size_t next = index;
@@ -104,7 +79,7 @@ void _AS_HeapHeapify(AS_Heap *self, size_t index) {
         self->tree[next] = self->tree[index];
         self->tree[index] = tmp;
 
-        _AS_HeapHeapify(self, next);
+        heapify(self, next);
     }
 }
 

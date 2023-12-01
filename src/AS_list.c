@@ -3,31 +3,6 @@
 
 #include "./AS_list.h"
 
-// int main() {
-//     int arr[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-//     AS_List list_obj;
-//     AS_List *list = &list_obj;
-//     AS_ListInit(list);
-
-//     for (int i = 0; i < 10; ++i) {
-//         if (list->append(list, (void *)&arr[i])) {
-//             return 1;
-//         }
-//     }
-
-//     printf("length: %lli\n", list->length);
-//     printf("%i, %i, %i\n", *(int *)list->get_at(list, 2), *(int *)list->get_at(list, 5), *(int *)list->get_at(list, 7));
-//     printf("%i\n", *(int *)list->pop(list, 3));
-//     printf("length: %lli\n", list->length);
-//     printf("%i\n", *(int *)list->pop_end(list));
-//     printf("length: %lli\n", list->length);
-
-//     list->free(list);
-
-//     return 0;
-// }
-
 int AS_ListInit(AS_List *self) {
     self->array = (void **)malloc(AS_LIST_CHUNK * sizeof(void *));
 
