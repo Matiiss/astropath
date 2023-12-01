@@ -1,6 +1,7 @@
 /* 
 reference implementation: https://gist.github.com/gerrymanoim/3519567d6afae5361032c032e0cc44f2
 from "Python Dictionaries: A confluence of a dozen great ideas - Raymond Hettinger"
+see https://www.youtube.com/watch?v=uRKiERJr6yg
 */
 
 #include <stdlib.h>
