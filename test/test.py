@@ -17,8 +17,8 @@ import cstar.astar
 #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 # ]
 tile_map = [
-    [0] * 100
-    for _ in range(100)
+    [0] * 32 * 3
+    for _ in range(32 * 3)
 ]
 
 tile_size = 32
@@ -43,12 +43,16 @@ for y, row in enumerate(tile_map):
                 )
             )
 
-
 N = 1
 
+# print(timeit("""
+# astar = cstar.astar.Astar(nodes)
+# """, number=N, globals=globals()))
+print("hi")
+astar = cstar.astar.Astar(nodes)
+print("hi")
 print(timeit("""
-cstar.astar.search(
-    nodes,
+astar.search(
     (tile_size / 2, tile_size / 2),
     (
         tile_size / 2 + (len(tile_map[0]) - 1) * tile_size,
