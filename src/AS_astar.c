@@ -29,7 +29,7 @@ double AS_EuclidianDistanceHeuristic(AS_ANode *self, AS_ANode *target) {
     return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 }
 
-int AS_AStarLeastDistance(void *primary, void *secondary) {
+inline int AS_AStarLeastDistance(void *primary, void *secondary) {
     return ((AS_ANode *)primary)->tentative_distance < ((AS_ANode *)secondary)->tentative_distance;
 }
 
