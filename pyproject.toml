@@ -17,5 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.urls]
+Homepage = "https://github.com/Matiiss/astropath"
+Issues = "https://github.com/Matiiss/astropath/issues"
+
 [tool.setuptools.packages.find]
 where = ["stubs", "docs"]
