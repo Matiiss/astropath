@@ -19,6 +19,11 @@ typedef struct {
 
 static void
 astar_dealloc(AstarObject *self) {
+    for (size_t i = 0; i < self->pos_dict->nodes->length; ++i) {
+        AS_DictNode *node = self->pos_dict->nodes->get_at(self->pos_dict->nodes, i);
+        PyObject *key = node->key;
+        Py_XDECREF(key);
+    }
     self->pos_dict->free(self->pos_dict);
     free(self->pos_dict);
 
@@ -63,6 +68,8 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
     for (Py_ssize_t i = 0; i < node_arr_length; ++i) {
         AS_ANode node;
         PyObject *tpl = (void *)PyList_GetItem(dict_keys, i);
+        Py_INCREF(tpl);
+
         double *vec = malloc(2 * sizeof(double));
         vec[0] = PyFloat_AsDouble(PyTuple_GET_ITEM(tpl, 0));
         vec[1] = PyFloat_AsDouble(PyTuple_GET_ITEM(tpl, 1));
@@ -142,7 +149,7 @@ astar_search(AstarObject *self, PyObject *args) {
     node_start = self->pos_dict->get(self->pos_dict, start);
     node_end = self->pos_dict->get(self->pos_dict, end);
 
-    if (AS_AStarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance, &hash, &eq_check) == 0) {
+    if (AS_AStarSearch(node_start, node_end, &euclidian_distance, &hash, &eq_check) == 0) {
         AS_Stack stack;
         AS_AStarReconstructPath(node_end, &stack);
         Py_ssize_t length = stack.size;
