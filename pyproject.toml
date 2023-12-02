@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "c-star"
+name = "astropath"
 version = "1.0.0a0"
 authors = [
   {name="Matiiss", email="matiiss@matiiss.com"},
