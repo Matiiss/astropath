@@ -5,17 +5,17 @@
 #include "./AS_stack.h"
 #include "./AS_dict.h"
 
-static PyObject *astar_search(PyObject *self, PyObject *args);
-double euclidian_distance(AS_ANode *self, AS_ANode *target);
-AS_Hash hash(PyObject *obj);
-int eq_check(PyObject *obj1, PyObject *obj2);
-
 typedef struct {
     PyObject_HEAD
     AS_ANode *node_arr;
     Py_ssize_t node_arr_length;
     AS_Dict *pos_dict;
 } AstarObject;
+
+static PyObject *astar_search(AstarObject *self, PyObject *args);
+double euclidian_distance(AS_ANode *self, AS_ANode *target);
+AS_Hash hash(PyObject *obj);
+int eq_check(PyObject *obj1, PyObject *obj2);
 
 static void
 astar_dealloc(AstarObject *self) {
@@ -56,7 +56,7 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
     }
 
     pos_dict = malloc(sizeof(AS_Dict));
-    AS_DictInit(pos_dict, &hash, &eq_check);
+    AS_DictInit(pos_dict, (AS_HashFunc)&hash, (AS_DictEqCheck)&eq_check);
     self->pos_dict = pos_dict;
 
     dict_keys = PyDict_Keys(dict);
@@ -149,7 +149,7 @@ astar_search(AstarObject *self, PyObject *args) {
     node_start = self->pos_dict->get(self->pos_dict, start);
     node_end = self->pos_dict->get(self->pos_dict, end);
 
-    if (AS_AStarSearch(node_start, node_end, &euclidian_distance, &hash, &eq_check) == 0) {
+    if (AS_AStarSearch(node_start, node_end, &euclidian_distance, (AS_HashFunc)&hash, (AS_DictEqCheck)&eq_check) == 0) {
         AS_Stack stack;
         AS_AStarReconstructPath(node_end, &stack);
         Py_ssize_t length = stack.size;

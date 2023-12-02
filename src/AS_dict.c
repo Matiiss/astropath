@@ -69,7 +69,7 @@ SlotTuple lookup(AS_Dict *self, AS_DictNode *target) {
             return tpl;
         } else if (node->state == DUMMY) {
             if (slot_state == UNSET) {
-                slot_state == SET;
+                slot_state = SET;
                 tpl.slot = i;
             }
         } else if (match_keys(self, node, target)) {

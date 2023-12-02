@@ -43,7 +43,7 @@ int AS_AStarReconstructPath(AS_ANode *end, AS_Stack *stack) {
         if (stack->push(stack, (void *)current->data2)) {
             return 1;
         }
-    } while (current = current->previous);
+    } while ((current = current->previous));
 
     return 0;
 }

@@ -26,7 +26,7 @@ struct AS_Dict {
 
     void *(*get)(AS_Dict *self, void *key);
     int (*set)(AS_Dict *self, void *key, void *item);
-    void (*del)(AS_Dict *self, void *key);
+    int (*del)(AS_Dict *self, void *key);
     void (*free)(AS_Dict *self);
 };
 
