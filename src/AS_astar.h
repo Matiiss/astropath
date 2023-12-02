@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "./AS_stack.h"
+#include "./AS_dict.h"
 
 typedef struct AS_ANode AS_ANode;
 typedef double (*AS_AStarHeuristic)(AS_ANode *current, AS_ANode *target);
@@ -11,6 +12,7 @@ typedef int (*AS_AStarEqualityCheck)(AS_ANode *current, AS_ANode *other);
 struct AS_ANode {
     // set on creation
     void *data;
+    void *data2;
     AS_ANode **neighbours;
     size_t neighbour_count;
     double (*distance_to)(AS_ANode *self, AS_ANode *other);
@@ -33,5 +35,7 @@ int AS_AStarSearch(
     size_t array_size, 
     AS_ANode *start, 
     AS_ANode *target,
-    AS_AStarHeuristic heuristic
+    AS_AStarHeuristic heuristic,
+    AS_HashFunc hash,
+    AS_DictEqCheck eq_check
 );

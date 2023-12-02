@@ -1,11 +1,13 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+
+#include <Python.h>
 
 #include "./AS_astar.h"
 #include "./AS_heap.h"
 #include "./AS_stack.h"
+#include "./AS_dict.h"
 
 #define UNUSED(x) (void)x
 
@@ -38,7 +40,7 @@ int AS_AStarReconstructPath(AS_ANode *end, AS_Stack *stack) {
     AS_ANode *current = end;
     do
     {
-        if (stack->push(stack, (void *)current->data)) {
+        if (stack->push(stack, (void *)current->data2)) {
             return 1;
         }
     } while (current = current->previous);
@@ -51,38 +53,31 @@ int AS_AStarSearch(
     size_t array_size,
     AS_ANode *start,
     AS_ANode *target,
-    AS_AStarHeuristic heuristic
+    AS_AStarHeuristic heuristic,
+    AS_HashFunc hash,
+    AS_DictEqCheck eq_check
 ) {
     if (heuristic == NULL) {
         heuristic = &AS_DijkstraHeuristic;
     }
 
+    start->tentative_distance = heuristic(start, target);
+    start->distance = 0;
+    start->previous = NULL;
+
     AS_Heap node_heap_obj;
     AS_Heap *node_heap = &node_heap_obj;
     AS_HeapInit(node_heap, &AS_AStarLeastDistance);
+    node_heap->push(node_heap, start);
 
-    time_t start_t = clock();
-
-    for (size_t i = 0; i < array_size; ++i) {
-        AS_ANode *node = &node_array[i];
-        node->previous = NULL;
-        if (node == start) {
-            node->distance = 0;
-            node->tentative_distance = heuristic(start, target);
-        } else {
-            node->distance = INFINITY;
-            node->tentative_distance = INFINITY;
-        }
-        node->visited = 0;
-        node_heap->push(node_heap, (void *)node);
-    }
-
-    time_t mid = clock();
-    printf("%lli\n", (mid - start_t));
+    AS_Dict pos_dict_obj;
+    AS_Dict *pos_dict = &pos_dict_obj;
+    AS_DictInit(pos_dict, hash, eq_check);
+    pos_dict->set(pos_dict, start->data2, start);
 
     while (node_heap->length) {
         node_heap->heapify(node_heap);
-        AS_ANode *node = (AS_ANode *)node_heap->pop(node_heap);
+        AS_ANode *node = node_heap->pop(node_heap);
         node->visited = 1;
 
         // if (eq_check(node, target)) {
@@ -91,7 +86,6 @@ int AS_AStarSearch(
                 goto failure;
             } else {
                 node_heap->free(node_heap);
-                printf("%lli\n", (clock() - mid));
                 return 0;
             }
         }
@@ -102,10 +96,15 @@ int AS_AStarSearch(
 
         for (size_t i = 0; i < node->neighbour_count; ++i) {
             AS_ANode *neighbour = node->neighbours[i];
-
-            // if (neighbour->visited) {
-            //     continue;
-            // }
+            
+            AS_ANode *dict_entry = pos_dict->get(pos_dict, neighbour->data2);
+            if (!dict_entry) {
+                neighbour->distance = INFINITY;
+                neighbour->tentative_distance = INFINITY;
+                neighbour->visited = 0;
+                neighbour->previous = NULL;
+                pos_dict->set(pos_dict, neighbour->data2, neighbour);
+            }
 
             double distance = node->distance + node->distance_to(node, neighbour);
             if (distance < neighbour->distance) {
@@ -113,19 +112,10 @@ int AS_AStarSearch(
                 neighbour->distance = distance;
                 neighbour->tentative_distance = distance + heuristic(neighbour, target);
 
-                if (neighbour->visited) {
+                if (neighbour->visited || !dict_entry) {
                     node_heap->push(node_heap, neighbour);
+                    neighbour->visited = 0;
                 }
-                // int contains = 0;
-                // for (size_t i = 0; i < node_heap->length; ++i) {
-                //     if (eq_check(neighbour, node_heap->tree[i])) {
-                //         contains = 1;
-                //         break;
-                //     }
-                // }
-                // if (!contains) {
-                //     node_heap->push(node_heap, neighbour);
-                // }
             }
         }
     }

@@ -58,6 +58,7 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
         vec[0] = PyFloat_AsDouble(PyTuple_GET_ITEM(tpl, 0));
         vec[1] = PyFloat_AsDouble(PyTuple_GET_ITEM(tpl, 1));
         node.data = (void *)vec;
+        node.data2 = (void *)tpl;
         node.distance_to = &euclidian_distance;
         node_arr[i] = node;
 
@@ -126,7 +127,7 @@ astar_search(AstarObject *self, PyObject *args) {
     node_start = self->pos_dict->get(self->pos_dict, start);
     node_end = self->pos_dict->get(self->pos_dict, end);
 
-    if (AS_AStarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance) == 0) {
+    if (AS_AStarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance, &hash, &eq_check) == 0) {
         AS_Stack stack;
         AS_AStarReconstructPath(node_end, &stack);
         Py_ssize_t length = stack.size;
