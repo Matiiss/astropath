@@ -86,6 +86,7 @@ int AS_AStarSearch(
                 goto failure;
             } else {
                 node_heap->free(node_heap);
+                pos_dict->free(pos_dict);
                 return 0;
             }
         }
@@ -122,5 +123,6 @@ int AS_AStarSearch(
 
 failure:
     node_heap->free(node_heap);
+    pos_dict->free(pos_dict);
     return 1;
 }
