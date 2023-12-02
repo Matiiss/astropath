@@ -1,5 +1,7 @@
 /* NOT a linked list */
 
+#pragma once
+
 #include <stdlib.h>
 
 #define AS_LIST_CHUNK 32
