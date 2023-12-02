@@ -5,6 +5,7 @@ see https://www.youtube.com/watch?v=uRKiERJr6yg
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "./AS_dict.h"
 
@@ -158,12 +159,14 @@ int AS_DictSet(AS_Dict *self, void *key, void *item) {
 
     SlotTuple tpl = lookup(self, &node);
     if (tpl.node->state != TAKEN) {
+        int state = tpl.node->state;
+        tpl.node->state = TAKEN;
         tpl.node->hash = node.hash;
         tpl.node->key = key;
         tpl.node->item = item;
         self->using++;
 
-        if (tpl.node->state == FREE) {
+        if (state == FREE) {
             self->fullness++;
             if (self->fullness * 3 > self->nodes->length * 2) {
                 if (resize(self, self->nodes->length * 4)) {
@@ -171,8 +174,6 @@ int AS_DictSet(AS_Dict *self, void *key, void *item) {
                 }
             }
         }
-
-        tpl.node->state = TAKEN;
     } else {
         tpl.node->item = item;
     }
