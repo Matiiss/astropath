@@ -3,12 +3,12 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cstar"
-version = "0.0.1"
+name = "c-star"
+version = "1.0.0a0"
 authors = [
-  { name="Matiiss", email="matiiss@matiiss.com"},
+  {name="Matiiss", email="matiiss@matiiss.com"},
 ]
-description = ""
+description = "A bunch of * pathfinding algorithms written in C for that extra squeeze of speed."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -16,3 +16,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[tool.setuptools.packages.find]
+where = ["stubs", "docs"]
