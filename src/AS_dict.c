@@ -100,6 +100,7 @@ AS_List *create_list(size_t new_size) {
         }
 
         new_node->state = FREE;
+        new_node->key = NULL;
         if (new_list->append(new_list, (void *)new_node)) {
             return NULL;
         }
