@@ -1,5 +1,5 @@
 ```
-:module: castar.astar
+:module: astropath.astar
 
 :class: Astar(nodes) -> Astar
     search(start, end) -> path | None
