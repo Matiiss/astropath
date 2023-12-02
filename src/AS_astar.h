@@ -31,8 +31,6 @@ double AS_DijkstraHeuristic(AS_ANode *current, AS_ANode *target);
 int AS_AStarLeastDistance(void *primary, void *secondary);
 int AS_AStarReconstructPath(AS_ANode *end, AS_Stack *stack);
 int AS_AStarSearch(
-    AS_ANode *node_array, 
-    size_t array_size, 
     AS_ANode *start, 
     AS_ANode *target,
     AS_AStarHeuristic heuristic,
