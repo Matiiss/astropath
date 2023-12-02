@@ -19,9 +19,18 @@ typedef struct {
 
 static void
 astar_dealloc(AstarObject *self) {
-    free(self->node_arr);
     self->pos_dict->free(self->pos_dict);
     free(self->pos_dict);
+
+    for (Py_ssize_t i = 0; i < self->node_arr_length; ++i) {
+        AS_ANode *node = &self->node_arr[i];
+        free(node->data);
+        free(node->neighbours);
+    }
+
+    // must free last because it contains a bunch of mallocs inside too (probably)
+    free(self->node_arr);
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 static int
@@ -65,6 +74,9 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
         pos_dict->set(pos_dict, tpl, (void *)&node_arr[i]);
     }
 
+    Py_DECREF(dict_keys);
+
+    // Python dicts are ordered, so keys and nodes are aligned
     dict_values = PyDict_Values(dict);
 
     for (Py_ssize_t i = 0; i < node_arr_length; ++i) {
@@ -77,8 +89,11 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
         for (Py_ssize_t j = 0; j < (Py_ssize_t)node->neighbour_count; ++j) {
             PyObject *neighbour_pos = PySequence_GetItem(neighbours, j);
             node->neighbours[j] = pos_dict->get(pos_dict, neighbour_pos);
+            Py_DECREF(neighbour_pos);
         }
     }
+
+    Py_DECREF(dict_values);
 
     return 0;
 }
@@ -137,6 +152,8 @@ astar_search(AstarObject *self, PyObject *args) {
             Py_INCREF(element);
             PyList_SetItem(ret_list, i, element);
         }
+
+        stack.free(&stack);
 
         return ret_list;
     }
