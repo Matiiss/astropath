@@ -74,7 +74,7 @@ int AS_AStarSearch(
     pos_dict->set(pos_dict, start->data2, start);
 
     while (node_heap->length) {
-        node_heap->heapify(node_heap);
+        // node_heap->heapify(node_heap);
         AS_ANode *node = node_heap->pop(node_heap);
         node->visited = 1;
 
