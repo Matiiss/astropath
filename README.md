@@ -28,6 +28,7 @@ nope
 
 # FSA*
 
+(Fringe-Saving A*)  
 maybe
 
 # G*
@@ -64,4 +65,5 @@ nope
 
 # LPA*
 
+(Lifelong Planning A*)  
 not yet, algthough D* Lite may already cover this
