@@ -1,26 +1,26 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include "./AS_astar.h"
-#include "./AS_stack.h"
-#include "./AS_dict.h"
+#include "./AP_astar.h"
+#include "./AP_stack.h"
+#include "./AP_dict.h"
 
 typedef struct {
     PyObject_HEAD
-    AS_ANode *node_arr;
+    AP_ANode *node_arr;
     Py_ssize_t node_arr_length;
-    AS_Dict *pos_dict;
+    AP_Dict *pos_dict;
 } AstarObject;
 
 static PyObject *astar_search(AstarObject *self, PyObject *args);
-double euclidian_distance(AS_ANode *self, AS_ANode *target);
-AS_Hash hash(PyObject *obj);
+double euclidian_distance(AP_ANode *self, AP_ANode *target);
+AP_Hash hash(PyObject *obj);
 int eq_check(PyObject *obj1, PyObject *obj2);
 
 static void
 astar_dealloc(AstarObject *self) {
     for (size_t i = 0; i < self->pos_dict->nodes->length; ++i) {
-        AS_DictNode *node = self->pos_dict->nodes->get_at(self->pos_dict->nodes, i);
+        AP_DictNode *node = self->pos_dict->nodes->get_at(self->pos_dict->nodes, i);
         PyObject *key = node->key;
         Py_XDECREF(key);
     }
@@ -28,7 +28,7 @@ astar_dealloc(AstarObject *self) {
     free(self->pos_dict);
 
     for (Py_ssize_t i = 0; i < self->node_arr_length; ++i) {
-        AS_ANode *node = &self->node_arr[i];
+        AP_ANode *node = &self->node_arr[i];
         free(node->data);
         free(node->neighbours);
     }
@@ -42,9 +42,9 @@ static int
 astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {"nodes", NULL};
     PyObject *dict, *dict_keys, *dict_values;
-    AS_ANode *node_arr;
+    AP_ANode *node_arr;
     Py_ssize_t node_arr_length;
-    AS_Dict *pos_dict;
+    AP_Dict *pos_dict;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &dict)) {
         return -1;
@@ -55,18 +55,18 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
         return -1;
     }
 
-    pos_dict = malloc(sizeof(AS_Dict));
-    AS_DictInit(pos_dict, (AS_HashFunc)&hash, (AS_DictEqCheck)&eq_check);
+    pos_dict = malloc(sizeof(AP_Dict));
+    AP_DictInit(pos_dict, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check);
     self->pos_dict = pos_dict;
 
     dict_keys = PyDict_Keys(dict);
     node_arr_length = PyList_Size(dict_keys);
     self->node_arr_length = node_arr_length;
-    node_arr = malloc(node_arr_length * sizeof(AS_ANode));
+    node_arr = malloc(node_arr_length * sizeof(AP_ANode));
     self->node_arr = node_arr;
 
     for (Py_ssize_t i = 0; i < node_arr_length; ++i) {
-        AS_ANode node;
+        AP_ANode node;
         PyObject *tpl = (void *)PyList_GetItem(dict_keys, i);
         Py_INCREF(tpl);
 
@@ -87,11 +87,11 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
     dict_values = PyDict_Values(dict);
 
     for (Py_ssize_t i = 0; i < node_arr_length; ++i) {
-        AS_ANode *node = &node_arr[i];
+        AP_ANode *node = &node_arr[i];
         PyObject *neighbours = PyList_GetItem(dict_values, i);
 
         node->neighbour_count = PySequence_Size(neighbours);
-        node->neighbours = malloc(node->neighbour_count * sizeof(AS_ANode *));
+        node->neighbours = malloc(node->neighbour_count * sizeof(AP_ANode *));
 
         for (Py_ssize_t j = 0; j < (Py_ssize_t)node->neighbour_count; ++j) {
             PyObject *neighbour_pos = PySequence_GetItem(neighbours, j);
@@ -105,7 +105,7 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-// double euclidian_distance(AS_ANode *self, AS_ANode *target) {
+// double euclidian_distance(AP_ANode *self, AP_ANode *target) {
 //     double x1, y1, x2, y2;
 //     PyObject *seq1 = (PyObject *)self->data;
 //     PyObject *seq2 = (PyObject *)target->data;
@@ -117,7 +117,7 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
 //     return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 // }
 
-double euclidian_distance(AS_ANode *self, AS_ANode *target) {
+double euclidian_distance(AP_ANode *self, AP_ANode *target) {
     double x1, y1, x2, y2;
     double *seq1 = self->data;
     double *seq2 = target->data;
@@ -129,7 +129,7 @@ double euclidian_distance(AS_ANode *self, AS_ANode *target) {
     return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 }
 
-AS_Hash hash(PyObject *obj) {
+AP_Hash hash(PyObject *obj) {
     return PyObject_Hash(obj);
 }
 
@@ -140,7 +140,7 @@ int eq_check(PyObject *obj1, PyObject *obj2) {
 static PyObject *
 astar_search(AstarObject *self, PyObject *args) {
     PyObject *start, *end, *ret_list;
-    AS_ANode *node_start, *node_end;
+    AP_ANode *node_start, *node_end;
 
     if (!PyArg_ParseTuple(args, "OO", &start, &end)) {
         return NULL;
@@ -149,9 +149,9 @@ astar_search(AstarObject *self, PyObject *args) {
     node_start = self->pos_dict->get(self->pos_dict, start);
     node_end = self->pos_dict->get(self->pos_dict, end);
 
-    if (AS_AStarSearch(node_start, node_end, &euclidian_distance, (AS_HashFunc)&hash, (AS_DictEqCheck)&eq_check) == 0) {
-        AS_Stack stack;
-        AS_AStarReconstructPath(node_end, &stack);
+    if (AP_APtarSearch(node_start, node_end, &euclidian_distance, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check) == 0) {
+        AP_Stack stack;
+        AP_APtarReconstructPath(node_end, &stack);
         Py_ssize_t length = stack.size;
         ret_list = PyList_New(length);
         for (Py_ssize_t i = 0; i < length; ++i) {

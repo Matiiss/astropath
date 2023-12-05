@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "./AS_heap.h"
+#include "./AP_heap.h"
 
-#define AS_HEAP_CHUNK 32
+#define AP_HEAP_CHUNK 32
 
 /*
 reference implementation for siftdown and siftup:
@@ -11,12 +11,12 @@ https://github.com/python/cpython/blob/main/Lib/heapq.py#L207
 https://github.com/python/cpython/blob/main/Lib/heapq.py#L260
 */
 
-void siftdown(AS_Heap *self, size_t end_pos, size_t pos);
-void siftup(AS_Heap *self, size_t pos);
-void heapify(AS_Heap *self, size_t index);
+void siftdown(AP_Heap *self, size_t end_pos, size_t pos);
+void siftup(AP_Heap *self, size_t pos);
+void heapify(AP_Heap *self, size_t index);
 
-int AS_HeapInit(AS_Heap *self, int (*compare)(void *primary, void *secondary)) {
-    self->tree = (void **)malloc(sizeof(void *) * AS_HEAP_CHUNK);
+int AP_HeapInit(AP_Heap *self, int (*compare)(void *primary, void *secondary)) {
+    self->tree = (void **)malloc(sizeof(void *) * AP_HEAP_CHUNK);
 
     if (!self->tree) {
         return 1;
@@ -24,21 +24,21 @@ int AS_HeapInit(AS_Heap *self, int (*compare)(void *primary, void *secondary)) {
     self->tree[0] = NULL;
 
     self->length = 0;
-    self->size = AS_HEAP_CHUNK;
+    self->size = AP_HEAP_CHUNK;
     self->compare = compare;
 
-    self->push = &AS_HeapPush;
-    self->pop = &AS_HeapPop;
-    self->heapify = &AS_HeapHeapify;
-    self->free = &AS_HeapFree;
+    self->push = &AP_HeapPush;
+    self->pop = &AP_HeapPop;
+    self->heapify = &AP_HeapHeapify;
+    self->free = &AP_HeapFree;
 
     return 0;
 }
 
-int AS_HeapPush(AS_Heap *self, void *element) {
+int AP_HeapPush(AP_Heap *self, void *element) {
     self->length++;
     if (self->length > self->size) {
-        self->size += AS_HEAP_CHUNK;
+        self->size += AP_HEAP_CHUNK;
         self->tree = (void **)realloc(self->tree, sizeof(void *) * self->size);
 
         if (!self->tree) {
@@ -52,7 +52,7 @@ int AS_HeapPush(AS_Heap *self, void *element) {
     return 0;
 }
 
-void *AS_HeapPop(AS_Heap *self) {
+void *AP_HeapPop(AP_Heap *self) {
     void *top = self->tree[0];
     if (!top) {
         return NULL;
@@ -67,13 +67,13 @@ void *AS_HeapPop(AS_Heap *self) {
     return top;
 }
 
-void AS_HeapHeapify(AS_Heap *self) {
+void AP_HeapHeapify(AP_Heap *self) {
     for (size_t index = self->length / 2; index >= 1; --index) {
         heapify(self, index - 1);
     }
 }
 
-void siftdown(AS_Heap *self, size_t end_pos, size_t pos) {
+void siftdown(AP_Heap *self, size_t end_pos, size_t pos) {
     void *current = self->tree[pos];
 
     while (pos > end_pos) {
@@ -89,7 +89,7 @@ void siftdown(AS_Heap *self, size_t end_pos, size_t pos) {
     self->tree[pos] = current;
 }
 
-void siftup(AS_Heap *self, size_t pos) {
+void siftup(AP_Heap *self, size_t pos) {
     size_t end_pos = self->length;
     size_t start_pos = pos;
     void *current = self->tree[pos];
@@ -113,7 +113,7 @@ void siftup(AS_Heap *self, size_t pos) {
     siftdown(self, start_pos, pos);
 }
 
-void heapify(AS_Heap *self, size_t index) {
+void heapify(AP_Heap *self, size_t index) {
     size_t left = index * 2 + 1;
     size_t right = index * 2 + 2;
     size_t next = index;
@@ -139,6 +139,6 @@ void heapify(AS_Heap *self, size_t index) {
     }
 }
 
-void AS_HeapFree(AS_Heap *self) {
+void AP_HeapFree(AP_Heap *self) {
     free(self->tree);
 }

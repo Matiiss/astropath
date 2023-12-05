@@ -1,19 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./AS_stack.h"
+#include "./AP_stack.h"
 
-void AS_StackInit(AS_Stack *self) {
+void AP_StackInit(AP_Stack *self) {
     self->head = NULL;
     self->size = 0;
 
-    self->push = &AS_StackPush;
-    self->pop = &AS_StackPop;
-    self->free = &AS_StackFree;
+    self->push = &AP_StackPush;
+    self->pop = &AP_StackPop;
+    self->free = &AP_StackFree;
 }
 
-int AS_StackPush(AS_Stack *self, void *data) {
-    AS_StackNode *new_node = malloc(sizeof(AS_StackNode));
+int AP_StackPush(AP_Stack *self, void *data) {
+    AP_StackNode *new_node = malloc(sizeof(AP_StackNode));
 
     if (!new_node) {
         return 1;
@@ -32,12 +32,12 @@ int AS_StackPush(AS_Stack *self, void *data) {
     return 0;
 }
 
-void *AS_StackPop(AS_Stack *self) {
+void *AP_StackPop(AP_Stack *self) {
     if (self->head == NULL) {
         return NULL;
     }
 
-    AS_StackNode *node = self->head;
+    AP_StackNode *node = self->head;
     void *data = node->data;
     self->head = node->next;
     free(node);
@@ -47,8 +47,8 @@ void *AS_StackPop(AS_Stack *self) {
     return data;
 }
 
-void AS_StackFree(AS_Stack *self) {
-    AS_StackNode *node = self->head, *next;
+void AP_StackFree(AP_Stack *self) {
+    AP_StackNode *node = self->head, *next;
     self->head = NULL;
 
     while (node) {
