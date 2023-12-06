@@ -24,7 +24,7 @@ typedef struct {
 } SlotTuple;
 
 int AP_DictInit(AP_Dict *self, AP_HashFunc hash, AP_DictEqCheck eq_check) {
-    self->nodes = create_list(32);
+    self->nodes = create_list(512);
     if (!self->nodes) {
         return 1;
     }

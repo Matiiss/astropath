@@ -129,27 +129,23 @@ double euclidian_distance(AP_ANode *self, AP_ANode *target) {
     return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 }
 
-AP_Hash hash(PyObject *obj) {
+inline AP_Hash hash(PyObject *obj) {
     return PyObject_Hash(obj);
 }
 
-int eq_check(PyObject *obj1, PyObject *obj2) {
+inline int eq_check(PyObject *obj1, PyObject *obj2) {
     return PyObject_RichCompareBool(obj1, obj2, Py_EQ);
 }
 
 static PyObject *
-astar_search(AstarObject *self, PyObject *args) {
+astar_search(AstarObject *self, PyObject *const *args, Py_ssize_t nargs) {
     PyObject *start, *end, *ret_list;
     AP_ANode *node_start, *node_end;
 
-    if (!PyArg_ParseTuple(args, "OO", &start, &end)) {
-        return NULL;
-    }
+    node_start = self->pos_dict->get(self->pos_dict, args[0]);
+    node_end = self->pos_dict->get(self->pos_dict, args[1]);
 
-    node_start = self->pos_dict->get(self->pos_dict, start);
-    node_end = self->pos_dict->get(self->pos_dict, end);
-
-    if (AP_APtarSearch(node_start, node_end, &euclidian_distance, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check) == 0) {
+    if (AP_APtarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check) == 0) {
         AP_Stack stack;
         AP_APtarReconstructPath(node_end, &stack);
         Py_ssize_t length = stack.size;
@@ -175,7 +171,7 @@ astar_search(AstarObject *self, PyObject *args) {
 // };
 
 static PyMethodDef astar_methods[] = {
-    {"search", (PyCFunction)astar_search, METH_VARARGS, NULL},
+    {"search", (PyCFunction)astar_search, METH_FASTCALL, NULL},
     {NULL}  /* Sentinel */
 };
 

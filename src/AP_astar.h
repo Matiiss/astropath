@@ -31,6 +31,8 @@ double AP_DijkstraHeuristic(AP_ANode *current, AP_ANode *target);
 int AP_APtarLeastDistance(void *primary, void *secondary);
 int AP_APtarReconstructPath(AP_ANode *end, AP_Stack *stack);
 int AP_APtarSearch(
+    AP_ANode *node_arr,
+    size_t node_arr_length,
     AP_ANode *start, 
     AP_ANode *target,
     AP_APtarHeuristic heuristic,
