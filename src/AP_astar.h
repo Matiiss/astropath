@@ -6,8 +6,8 @@
 #include "./AP_dict.h"
 
 typedef struct AP_ANode AP_ANode;
-typedef double (*AP_APtarHeuristic)(AP_ANode *current, AP_ANode *target);
-typedef int (*AP_APtarEqualityCheck)(AP_ANode *current, AP_ANode *other);
+typedef double (*AP_AStarHeuristic)(AP_ANode *current, AP_ANode *target);
+typedef int (*AP_AStarEqualityCheck)(AP_ANode *current, AP_ANode *other);
 
 struct AP_ANode {
     // set on creation
@@ -28,9 +28,9 @@ void AP_ANodeFree(AP_ANode *self);
 
 double AP_DijkstraHeuristic(AP_ANode *current, AP_ANode *target);
 
-int AP_APtarLeastDistance(void *primary, void *secondary);
-int AP_APtarReconstructPath(AP_ANode *end, AP_Stack *stack);
-int AP_APtarSearch(
+int AP_AStarLeastDistance(void *primary, void *secondary);
+int AP_AStarReconstructPath(AP_ANode *end, AP_Stack *stack);
+int AP_AStarSearch(
     AP_ANode *node_arr,
     size_t node_arr_length,
     AP_ANode *start, 

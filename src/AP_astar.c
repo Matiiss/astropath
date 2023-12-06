@@ -2,12 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <Python.h>
-
 #include "./AP_astar.h"
 #include "./AP_heap.h"
 #include "./AP_stack.h"
-#include "./AP_dict.h"
+#include "./AP_list.h"
 
 #define UNUSED(x) (void)x
 
@@ -31,11 +29,11 @@ double AP_EuclidianDistanceHeuristic(AP_ANode *self, AP_ANode *target) {
     return pow(pow(x2 - x1, 2) + pow(y2 - y1, 2), 0.5);
 }
 
-inline int AP_APtarLeastDistance(void *primary, void *secondary) {
+inline int AP_AStarLeastDistance(void *primary, void *secondary) {
     return ((AP_ANode *)primary)->tentative_distance < ((AP_ANode *)secondary)->tentative_distance;
 }
 
-int AP_APtarReconstructPath(AP_ANode *end, AP_Stack *stack) {
+int AP_AStarReconstructPath(AP_ANode *end, AP_Stack *stack) {
     AP_StackInit(stack);
     AP_ANode *current = end;
     do
@@ -48,12 +46,12 @@ int AP_APtarReconstructPath(AP_ANode *end, AP_Stack *stack) {
     return 0;
 }
 
-int AP_APtarSearch(
+int AP_AStarSearch(
     AP_ANode *node_arr,
     size_t node_arr_length,
     AP_ANode *start,
     AP_ANode *target,
-    AP_APtarHeuristic heuristic,
+    AP_AStarHeuristic heuristic,
     AP_HashFunc hash,
     AP_DictEqCheck eq_check
 ) {
@@ -61,14 +59,14 @@ int AP_APtarSearch(
         heuristic = &AP_DijkstraHeuristic;
     }
 
-    for (size_t i = 0; i < node_arr_length; ++i) {
-        AP_ANode *node = &node_arr[i];
+    // for (size_t i = 0; i < node_arr_length; ++i) {
+    //     AP_ANode *node = &node_arr[i];
 
-        node->previous = NULL;
-        node->distance = INFINITY;
-        node->tentative_distance = INFINITY;
-        node->visited = 1;
-    }
+    //     node->previous = NULL;
+    //     node->distance = INFINITY;
+    //     node->tentative_distance = INFINITY;
+    //     node->visited = 1;
+    // }
 
     start->tentative_distance = heuristic(start, target);
     start->distance = 0;
@@ -76,8 +74,12 @@ int AP_APtarSearch(
 
     AP_Heap node_heap_obj;
     AP_Heap *node_heap = &node_heap_obj;
-    AP_HeapInit(node_heap, &AP_APtarLeastDistance);
+    AP_HeapInit(node_heap, &AP_AStarLeastDistance);
     node_heap->push(node_heap, start);
+
+    AP_List list_obj;
+    AP_List *list = &list_obj;
+    AP_ListInit(list);
 
     while (node_heap->length) {
         AP_ANode *node = node_heap->pop(node_heap);
