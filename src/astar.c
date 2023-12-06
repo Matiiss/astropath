@@ -82,7 +82,8 @@ astar_init(AstarObject *self, PyObject *args, PyObject *kwds) {
         node.previous = NULL;
         node.distance = INFINITY;
         node.tentative_distance = INFINITY;
-        node.visited = 1;
+        node.in_heap = 0;
+        node.in_used_list = 0;
 
         node_arr[i] = node;
         pos_dict->set(pos_dict, tpl, (void *)&node_arr[i]);
@@ -152,9 +153,8 @@ astar_search(AstarObject *self, PyObject *const *args, Py_ssize_t nargs) {
     node_start = self->pos_dict->get(self->pos_dict, args[0]);
     node_end = self->pos_dict->get(self->pos_dict, args[1]);
 
-    if (AP_AStarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check) == 0) {
-        AP_Stack stack;
-        AP_AStarReconstructPath(node_end, &stack);
+    AP_Stack stack;
+    if (AP_AStarSearch(self->node_arr, self->node_arr_length, node_start, node_end, &euclidian_distance, (AP_HashFunc)&hash, (AP_DictEqCheck)&eq_check, &stack) == 0) {
         Py_ssize_t length = stack.size;
         ret_list = PyList_New(length);
         for (Py_ssize_t i = 0; i < length; ++i) {

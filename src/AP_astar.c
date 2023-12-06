@@ -53,20 +53,12 @@ int AP_AStarSearch(
     AP_ANode *target,
     AP_AStarHeuristic heuristic,
     AP_HashFunc hash,
-    AP_DictEqCheck eq_check
+    AP_DictEqCheck eq_check,
+    AP_Stack *result_stack
 ) {
     if (heuristic == NULL) {
         heuristic = &AP_DijkstraHeuristic;
     }
-
-    // for (size_t i = 0; i < node_arr_length; ++i) {
-    //     AP_ANode *node = &node_arr[i];
-
-    //     node->previous = NULL;
-    //     node->distance = INFINITY;
-    //     node->tentative_distance = INFINITY;
-    //     node->visited = 1;
-    // }
 
     start->tentative_distance = heuristic(start, target);
     start->distance = 0;
@@ -78,18 +70,39 @@ int AP_AStarSearch(
     node_heap->push(node_heap, start);
 
     AP_List list_obj;
-    AP_List *list = &list_obj;
-    AP_ListInit(list);
+    AP_List *used_list = &list_obj;
+    AP_ListInit(used_list);
 
     while (node_heap->length) {
         AP_ANode *node = node_heap->pop(node_heap);
-        node->visited = 1;
+        node->in_heap = 0;
+
+        if (!node->in_used_list) {
+            node->in_used_list = 1;
+            used_list->append(used_list, (void *)node);
+        }
 
         if (node == target) {
             if (node->previous == NULL) {
                 goto failure;
             } else {
                 node_heap->free(node_heap);
+
+                if (AP_AStarReconstructPath(target, result_stack)) {
+                    return 1;
+                }
+
+                for (size_t i = 0; i < used_list->length; ++i) {
+                    AP_ANode *node = used_list->get_at(used_list, i);
+                    node->previous = NULL;
+                    node->distance = INFINITY;
+                    node->tentative_distance = INFINITY;
+                    node->in_heap = 0;
+                    node->in_used_list = 0;
+                }
+
+                used_list->free(used_list);
+
                 return 0;
             }
         }
@@ -107,9 +120,9 @@ int AP_AStarSearch(
                 neighbour->distance = distance;
                 neighbour->tentative_distance = distance + heuristic(neighbour, target);
 
-                if (neighbour->visited) {
+                if (!neighbour->in_heap) {
                     node_heap->push(node_heap, neighbour);
-                    neighbour->visited = 0;
+                    neighbour->in_heap = 1;
                 }
             }
         }

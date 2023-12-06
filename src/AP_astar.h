@@ -21,7 +21,8 @@ struct AP_ANode {
     AP_ANode *previous;
     double distance;
     double tentative_distance;
-    int visited;
+    int in_heap;
+    int in_used_list;
 };
 
 void AP_ANodeFree(AP_ANode *self);
@@ -35,7 +36,8 @@ int AP_AStarSearch(
     size_t node_arr_length,
     AP_ANode *start, 
     AP_ANode *target,
-    AP_APtarHeuristic heuristic,
+    AP_AStarHeuristic heuristic,
     AP_HashFunc hash,
-    AP_DictEqCheck eq_check
+    AP_DictEqCheck eq_check,
+    AP_Stack *result_stack
 );
